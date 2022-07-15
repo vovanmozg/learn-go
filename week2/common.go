@@ -43,6 +43,7 @@ var OverheatUnlock = func() {
 }
 
 var DataSignerMd5 = func(data string) string {
+	fmt.Println("START: DataSignerMd5")
 	OverheatLock()
 	defer OverheatUnlock()
 	data += DataSignerSalt

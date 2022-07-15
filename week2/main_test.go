@@ -83,31 +83,40 @@ func TestSigner(t *testing.T) {
 		}
 	}
 	DataSignerMd5 = func(data string) string {
+		fmt.Println("DataSignerMd5: START: " + data)
 		atomic.AddUint32(&DataSignerMd5Counter, 1)
 		OverheatLock()
 		defer OverheatUnlock()
 		data += DataSignerSalt
 		dataHash := fmt.Sprintf("%x", md5.Sum([]byte(data)))
 		time.Sleep(10 * time.Millisecond)
+		fmt.Println("DataSignerMd5: FINISH: " + data + " " + dataHash)
 		return dataHash
 	}
 	DataSignerCrc32 = func(data string) string {
+		fmt.Println("DataSignerCrc32: START: " + data)
 		atomic.AddUint32(&DataSignerCrc32Counter, 1)
 		data += DataSignerSalt
 		crcH := crc32.ChecksumIEEE([]byte(data))
 		dataHash := strconv.FormatUint(uint64(crcH), 10)
 		time.Sleep(time.Second)
+		fmt.Println("DataSignerCrc32: FINISH: " + data + " " + dataHash)
 		return dataHash
 	}
 
 	inputData := []int{0, 1, 1, 2, 3, 5, 8}
-	// inputData := []int{0,1}
+	//inputData := []int{0, 1}
 
 	hashSignJobs := []job{
+
 		job(func(in, out chan interface{}) {
+			fmt.Println("TestPipeline: Start first job")
 			for _, fibNum := range inputData {
+				fmt.Println("TestPipeline: Prepare to write to 'out': " + strconv.Itoa(fibNum))
 				out <- fibNum
+				fmt.Println("TestPipeline: Wrote to 'out': " + strconv.Itoa(fibNum))
 			}
+			fmt.Println("TestPipeline: Finish first job")
 		}),
 		job(SingleHash),
 		job(MultiHash),
